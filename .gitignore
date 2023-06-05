@@ -39,3 +39,7 @@ cypress/videos
 cypress/screenshots
 
 .eslintcache
+
+# pb_data - stores your application data, uploaded files, etc. (usually should be added in .gitignore).
+# https://pocketbase.io/docs/
+pb_data/
