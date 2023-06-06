@@ -1,8 +1,3 @@
-/**
- * "...show UI that is shared across multiple routes."
- * https://nextjs.org/docs/app/building-your-application/routing/defining-routes#creating-ui
- */
-
 import { Inter } from 'next/font/google';
 import React, { type ReactElement } from 'react';
 import NavBar from './components/nav-bar';

@@ -10,5 +10,10 @@ const NoteSchema = z.object({
   updated: z.string(),
 });
 
+const NoteParamsSchema = z.object({
+  id: z.string(),
+});
+
 // Types inferred from schemas
+export type NoteParamsType = z.infer<typeof NoteParamsSchema>;
 export type NoteType = z.infer<typeof NoteSchema>;

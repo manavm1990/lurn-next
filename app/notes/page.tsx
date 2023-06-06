@@ -1,6 +1,7 @@
-import Note from '@/notes/components/note';
 import { env } from '@/lib/constants';
-import { type NoteType } from '@/types/note';
+import Note from '@/notes/components/note';
+import { type NoteType } from '@/types/note.types';
+import Link from 'next/link';
 import { type ReactElement } from 'react';
 
 async function index(): Promise<NoteType[]> {
@@ -17,15 +18,17 @@ async function index(): Promise<NoteType[]> {
   return data.items;
 }
 
-export default async function Notes(): Promise<ReactElement> {
+export default async function NotesPage(): Promise<ReactElement> {
   const notes = await index();
 
   return (
-    <main className="container mx-auto px-8">
-      <h1 className="text-center">🎶</h1>
+    <main className="container">
+      <h1>🎶</h1>
       <div className="grid grid-cols-4">
         {notes.map((note) => (
-          <Note key={note.id} note={note} />
+          <Link key={note.id} href={`/notes/${note.id}`}>
+            <Note noteData={note} />
+          </Link>
         ))}
       </div>
     </main>

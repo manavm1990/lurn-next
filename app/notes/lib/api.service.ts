@@ -6,3 +6,9 @@ export async function getNotes(): Promise<Response> {
 
   return res;
 }
+
+export async function getNoteById(id: string): Promise<Response> {
+  const res = await fetch(`${env.DB_HOST}/collections/notes/records/${id}`);
+
+  return res;
+}
