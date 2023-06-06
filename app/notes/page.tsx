@@ -1,19 +1,7 @@
+import Note from '@/components/note';
 import { env } from '@/lib/constants';
+import { type NoteType } from '@/types/note';
 import { type ReactElement } from 'react';
-import { z } from 'zod';
-
-const Note = z.object({
-  collectionId: z.string(),
-  collectionName: z.string(),
-  content: z.string(),
-  created: z.string(),
-  id: z.string(),
-  title: z.string(),
-  updated: z.string(),
-});
-
-// Types inferred from schemas
-type NoteType = z.infer<typeof Note>;
 
 async function index(): Promise<NoteType[]> {
   const res = await fetch(`${env.BASE_URL}/api/notes/`);
@@ -33,16 +21,13 @@ export default async function Notes(): Promise<ReactElement> {
   const notes = await index();
 
   return (
-    <main>
-      <h1>🎶</h1>
-      {notes.map((note) => (
-        // TODO: Move this to a component
-        <section key={note.id}>
-          <h2>{note.title}</h2>
-          <p>{note.content}</p>
-          <time>{note.created}</time>
-        </section>
-      ))}
+    <main className="container mx-auto px-8">
+      <h1 className="text-center">🎶</h1>
+      <div className="grid grid-cols-4">
+        {notes.map((note) => (
+          <Note key={note.id} note={note} />
+        ))}
+      </div>
     </main>
   );
 }
