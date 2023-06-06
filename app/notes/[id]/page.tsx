@@ -1,10 +1,10 @@
-import { env } from '@/lib/constants';
+import { BASE_URL } from '@/lib/constants';
 import { type NoteParamsType, type NoteType } from '@/types/note.types';
 import { type ReactElement } from 'react';
 import Note from '../components/note';
 
 async function show(id: string): Promise<NoteType> {
-  const res = await fetch(`${env.BASE_URL}/api/notes/${id}`);
+  const res = await fetch(`${BASE_URL}/api/notes/${id}`);
 
   // Recommendation: handle errors
   if (!res.ok) {

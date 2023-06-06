@@ -1,11 +1,14 @@
-import { env } from '@/lib/constants';
+'use client';
+
+import { BASE_URL } from '@/lib/constants';
 import Note from '@/notes/components/note';
 import { type NoteType } from '@/types/note.types';
 import Link from 'next/link';
 import { type ReactElement } from 'react';
+import Container from '@mui/material/Container';
 
 async function index(): Promise<NoteType[]> {
-  const res = await fetch(`${env.BASE_URL}/api/notes/`);
+  const res = await fetch(`${BASE_URL}/api/notes/`);
 
   // Recommendation: handle errors
   if (!res.ok) {
@@ -22,7 +25,7 @@ export default async function NotesPage(): Promise<ReactElement> {
   const notes = await index();
 
   return (
-    <main className="container">
+    <Container>
       <h1>🎶</h1>
       <div className="grid grid-cols-4">
         {notes.map((note) => (
@@ -31,6 +34,6 @@ export default async function NotesPage(): Promise<ReactElement> {
           </Link>
         ))}
       </div>
-    </main>
+    </Container>
   );
 }
