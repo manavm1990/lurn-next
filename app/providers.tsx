@@ -4,6 +4,7 @@ import { CssBaseline, ThemeProvider } from '@mui/material';
 import { createTheme } from '@mui/material/styles';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { type ReactElement } from 'react';
 
 // Create a client
 const queryClient = new QueryClient();
@@ -18,7 +19,7 @@ export default function Providers({
   children,
 }: {
   children: React.ReactNode;
-}): JSX.Element {
+}): ReactElement {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider theme={darkTheme}>
