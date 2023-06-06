@@ -1,4 +1,4 @@
-import getNotes from '../../lib/get-notes';
+import { getNotes } from '@/lib';
 
 export async function GET(): Promise<Response> {
   return await getNotes();

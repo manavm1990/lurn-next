@@ -1,6 +1,6 @@
+import { env } from '@/lib/constants';
 import { type ReactElement } from 'react';
 import { z } from 'zod';
-import { env } from '../lib/constants';
 
 const Note = z.object({
   collectionId: z.string(),
