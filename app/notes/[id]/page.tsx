@@ -1,3 +1,5 @@
+'use client';
+
 import { BASE_URL } from '@/lib/constants';
 import { type NoteParamsType, type NoteType } from '@/types/note.types';
 import Container from '@mui/material/Container';
