@@ -1,4 +1,4 @@
-import Note from '@/components/note';
+import Note from '@/notes/components/note';
 import { env } from '@/lib/constants';
 import { type NoteType } from '@/types/note';
 import { type ReactElement } from 'react';
