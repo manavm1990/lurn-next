@@ -1,5 +1,8 @@
+'use client';
+
 import { env } from '@/lib/constants';
 import { type NoteParamsType, type NoteType } from '@/types/note.types';
+import Container from '@mui/material/Container';
 import { type ReactElement } from 'react';
 import Note from '../components/note';
 
@@ -24,9 +27,9 @@ export default async function NotePage({
 }): Promise<ReactElement> {
   const noteData = await show(params.id);
   return (
-    <main className="container">
+    <Container>
       <h1>Note 🆔: {params.id}</h1>
       <Note noteData={noteData} />
-    </main>
+    </Container>
   );
 }
