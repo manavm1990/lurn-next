@@ -3,6 +3,9 @@
 @tailwind utilities;
 
 @layer base {
+  h1 {
+    @apply text-center;
+  }
   li {
     @apply list-none text-xl font-semibold;
   }
