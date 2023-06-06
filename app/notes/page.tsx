@@ -1,6 +1,6 @@
 'use client';
 
-import { env } from '@/lib/constants';
+import { BASE_URL } from '@/lib/constants';
 import Note from '@/notes/components/note';
 import { type NoteType } from '@/types/note.types';
 import Container from '@mui/material/Container';
@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { type ReactElement } from 'react';
 
 async function index(): Promise<NoteType[]> {
-  const res = await fetch(`${env.BASE_URL}/api/notes/`);
+  const res = await fetch(`${BASE_URL}/api/notes/`);
 
   // Recommendation: handle errors
   if (!res.ok) {
