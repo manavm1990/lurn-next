@@ -4,11 +4,11 @@
  */
 
 import { Inter } from 'next/font/google';
-import React from 'react';
+import React, { type ReactElement } from 'react';
+import NavBar from './components/nav-bar';
 import './globals.css';
 import NotFound from './not-found';
 import Providers from './providers';
-import { type ReactElement } from 'react';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -32,6 +32,7 @@ export default function RootLayout({
           
             We are not going to use this ourselves to render other stuff like strings, etc. 
           */}
+          <NavBar />
           {React.isValidElement(children) ? children : <NotFound />}
         </Providers>
       </body>
