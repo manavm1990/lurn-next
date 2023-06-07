@@ -10,5 +10,6 @@ const NoteSchema = z.object({
   updated: z.string(),
 });
 
+export type NewNoteType = Pick<NoteType, 'title' | 'content'>;
 export type NoteParamsType = Pick<NoteType, 'id'>;
 export type NoteType = z.infer<typeof NoteSchema>;
