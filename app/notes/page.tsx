@@ -6,6 +6,7 @@ import { type NoteType } from '@/types/note.types';
 import Container from '@mui/material/Container';
 import Link from 'next/link';
 import { type ReactElement } from 'react';
+import CreateNote from './components/create-note';
 
 async function index(): Promise<NoteType[]> {
   const res = await fetch(`${BASE_URL}/api/notes/`);
@@ -25,7 +26,7 @@ export default async function NotesPage(): Promise<ReactElement> {
   const notes = await index();
 
   return (
-    <Container>
+    <Container className="space-y-8">
       <h1>🎶</h1>
       <div className="grid grid-cols-4">
         {notes.map((note) => (
@@ -34,6 +35,12 @@ export default async function NotesPage(): Promise<ReactElement> {
           </Link>
         ))}
       </div>
+
+      <CreateNote
+        onSubmit={(data) => {
+          console.log(data);
+        }}
+      />
     </Container>
   );
 }
