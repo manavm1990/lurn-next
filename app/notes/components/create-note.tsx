@@ -50,8 +50,11 @@ export default function CreateNote({
       />
       <Button
         variant="contained"
-        className="bg-green-500 text-white"
+        className={`${
+          Object.keys(errors).length > 0 ? 'bg-gray-500' : 'bg-green-500'
+        } text-white`}
         type="submit"
+        disabled={Object.keys(errors).length > 0}
       >
         Submit
       </Button>
