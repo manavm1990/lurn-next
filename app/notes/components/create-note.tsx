@@ -1,15 +1,11 @@
+import { NewNoteSchema } from '@/types/note.types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, TextField } from '@mui/material';
 import { type ReactElement } from 'react';
 import { useForm } from 'react-hook-form';
-import { z } from 'zod';
+import { type z } from 'zod';
 
-const formSchema = z.object({
-  title: z.string().nonempty('Title is required'),
-  content: z.string().nonempty('Content is required'),
-});
-
-type FormValues = z.infer<typeof formSchema>;
+type FormValues = z.infer<typeof NewNoteSchema>;
 
 interface CreateNoteProps {
   onSubmit: (data: FormValues) => void;
@@ -25,7 +21,7 @@ export default function CreateNote({
     reset,
   } = useForm<FormValues>({
     mode: 'onBlur',
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(NewNoteSchema),
   });
 
   const handleSubmitWithReset = (data: FormValues): void => {
