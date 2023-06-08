@@ -1,16 +1,15 @@
 'use client';
+
 import { BASE_URL } from '@/lib/constants';
 import Note from '@/notes/components/note';
 import { type NewNoteType, type NoteType } from '@/types/note.types';
 import Alert from '@mui/material/Alert';
 import Container from '@mui/material/Container';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { type ReactElement } from 'react';
 import CreateNote from './components/create-note';
 import useError from './hooks/use-error';
-
-// TODO: Resolve issue with infinite fetches.
 
 async function index(): Promise<NoteType[]> {
   const res = await fetch(`${BASE_URL}/api/notes/`);
@@ -48,15 +47,33 @@ async function create(data: NewNoteType): Promise<NoteType> {
 export default async function NotesPage(): Promise<ReactElement> {
   const [error, setError] = useError();
 
-  const router = useRouter();
-
-  const notes = await index();
+  const mutation = useMutation({
+    mutationFn: create,
+    async onSuccess() {
+      setError(null);
+      await queryClient.invalidateQueries({
+        queryKey: ['notes'],
+      });
+    },
+    onError(error) {
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError('Something went wrong!');
+      }
+    },
+  });
+  const query = useQuery({
+    queryKey: ['notes'],
+    queryFn: index,
+  });
+  const queryClient = useQueryClient();
 
   return (
     <Container className="space-y-8">
       <h1>🎶</h1>
       <div className="grid grid-cols-4">
-        {notes.map((note) => (
+        {query.data?.map((note) => (
           <Link key={note.id} href={`/notes/${note.id}`}>
             <Note noteData={note} />
           </Link>
@@ -65,16 +82,7 @@ export default async function NotesPage(): Promise<ReactElement> {
 
       <CreateNote
         onSubmit={async (data) => {
-          try {
-            await create({ ...data });
-            router.refresh();
-          } catch (error) {
-            if (error instanceof Error) {
-              setError(error.message);
-            } else {
-              setError('Something went wrong!');
-            }
-          }
+          mutation.mutate(data);
         }}
       />
 
