@@ -48,6 +48,7 @@ export default function CreateNote({
         error={Boolean(errors.content)}
         helperText={errors.content?.message}
       />
+
       <Button
         variant="contained"
         className={`${

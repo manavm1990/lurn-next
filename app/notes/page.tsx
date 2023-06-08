@@ -1,20 +1,23 @@
 'use client';
-
 import { BASE_URL } from '@/lib/constants';
 import Note from '@/notes/components/note';
-import { type NoteType } from '@/types/note.types';
+import { type NewNoteType, type NoteType } from '@/types/note.types';
+import Alert from '@mui/material/Alert';
 import Container from '@mui/material/Container';
 import Link from 'next/link';
-import { type ReactElement } from 'react';
+import { useRouter } from 'next/navigation';
+import { useState, type ReactElement } from 'react';
 import CreateNote from './components/create-note';
+
+// TODO: Resolve issue with infinite fetches.
 
 async function index(): Promise<NoteType[]> {
   const res = await fetch(`${BASE_URL}/api/notes/`);
 
-  // Recommendation: handle errors
   if (!res.ok) {
-    // This will activate the closest `error.js` Error Boundary
-    throw new Error('Failed to fetch data');
+    throw new Error(
+      'Failed to fetch data. The database 🗃️ connection 🔌 is probably down. 🥅'
+    );
   }
 
   const data = await res.json();
@@ -22,7 +25,30 @@ async function index(): Promise<NoteType[]> {
   return data.items;
 }
 
+async function create(data: NewNoteType): Promise<NoteType> {
+  const res = await fetch(`${BASE_URL}/api/notes/`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!res.ok) {
+    const errorData: { error: string } = await res.json();
+    throw new Error(`${res.status}: ${errorData.error}`);
+  }
+
+  const returnedData = await res.json();
+
+  return returnedData;
+}
+
 export default async function NotesPage(): Promise<ReactElement> {
+  const [error, setError] = useState<string>();
+
+  const router = useRouter();
+
   const notes = await index();
 
   return (
@@ -37,10 +63,21 @@ export default async function NotesPage(): Promise<ReactElement> {
       </div>
 
       <CreateNote
-        onSubmit={(data) => {
-          console.log(data);
+        onSubmit={async (data) => {
+          try {
+            await create({ ...data });
+            router.refresh();
+          } catch (error) {
+            if (error instanceof Error) {
+              setError(error.message);
+            } else {
+              setError('Something went wrong!');
+            }
+          }
         }}
       />
+
+      {Boolean(error) && <Alert severity="error">{error}</Alert>}
     </Container>
   );
 }
