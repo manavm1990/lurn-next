@@ -6,8 +6,9 @@ import Alert from '@mui/material/Alert';
 import Container from '@mui/material/Container';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState, type ReactElement } from 'react';
+import { type ReactElement } from 'react';
 import CreateNote from './components/create-note';
+import useError from './hooks/use-error';
 
 // TODO: Resolve issue with infinite fetches.
 
@@ -45,7 +46,7 @@ async function create(data: NewNoteType): Promise<NoteType> {
 }
 
 export default async function NotesPage(): Promise<ReactElement> {
-  const [error, setError] = useState<string>();
+  const [error, setError] = useError();
 
   const router = useRouter();
 
