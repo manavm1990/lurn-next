@@ -11,12 +11,11 @@ import { type NewNoteType, type NoteType } from '@/types/note.types';
 import Alert from '@mui/material/Alert';
 import Container from '@mui/material/Container';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { type ReactElement } from 'react';
 import useSWR from 'swr';
 import CreateNote from './components/create-note';
 import useError from './hooks/use-error';
-
+// TODO: Use `axios` instead of `fetch` for better error handling.
 async function index(): Promise<NoteType[]> {
   const res = await fetch(`${BASE_URL}/api/notes/`);
 
@@ -53,15 +52,13 @@ async function create(data: NewNoteType): Promise<NoteType> {
 export default async function NotesPage(): Promise<ReactElement> {
   const [error, setError] = useError();
 
-  const { data } = useSWR(
+  const { data, mutate } = useSWR(
     // Using the URL as the key, so that the data is cached.
     `${BASE_URL}/api/notes/`,
 
     // Fetcher function ☝️.
     index
   );
-
-  const router = useRouter();
 
   return (
     <Container className="space-y-8">
@@ -75,14 +72,17 @@ export default async function NotesPage(): Promise<ReactElement> {
       </div>
 
       <CreateNote
-        onSubmit={(data) => {
-          create(data)
-            .then(() => {
-              router.refresh();
-            })
-            .catch((err) => {
-              setError(err.message);
-            });
+        onSubmit={async (submittedNote) => {
+          try {
+            const createdNote = await create(submittedNote);
+            await mutate([...(data ?? []), createdNote], false);
+          } catch (error) {
+            if (error instanceof Error) {
+              setError(error.message);
+            } else {
+              setError('Something went wrong!');
+            }
+          }
         }}
       />
 
