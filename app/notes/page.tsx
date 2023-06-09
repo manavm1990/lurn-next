@@ -10,8 +10,8 @@ import Note from '@/notes/components/note';
 import { type NewNoteType, type NoteType } from '@/types/note.types';
 import Alert from '@mui/material/Alert';
 import Container from '@mui/material/Container';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { type ReactElement } from 'react';
 import useSWR from 'swr';
 import CreateNote from './components/create-note';
@@ -57,6 +57,7 @@ export default async function NotesPage(): Promise<ReactElement> {
     // Using the URL as the key, so that the data is cached.
     `${BASE_URL}/api/notes/`,
 
+    // Fetcher function ☝️.
     index
   );
 
@@ -73,7 +74,17 @@ export default async function NotesPage(): Promise<ReactElement> {
         ))}
       </div>
 
-      <CreateNote onSubmit={mutation.mutate} />
+      <CreateNote
+        onSubmit={(data) => {
+          create(data)
+            .then(() => {
+              router.refresh();
+            })
+            .catch((err) => {
+              setError(err.message);
+            });
+        }}
+      />
 
       {Boolean(error) && <Alert severity="error">{error}</Alert>}
     </Container>
