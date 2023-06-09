@@ -47,6 +47,8 @@ async function create(data: NewNoteType): Promise<NoteType> {
 export default async function NotesPage(): Promise<ReactElement> {
   const [error, setError] = useError();
 
+  const queryClient = useQueryClient();
+
   const mutation = useMutation({
     mutationFn: create,
     async onSuccess() {
@@ -56,18 +58,15 @@ export default async function NotesPage(): Promise<ReactElement> {
       });
     },
     onError(error) {
-      if (error instanceof Error) {
-        setError(error.message);
-      } else {
-        setError('Something went wrong!');
-      }
+      setError(
+        error instanceof Error ? error.message : 'Something went wrong!'
+      );
     },
   });
   const query = useQuery({
     queryKey: ['notes'],
     queryFn: index,
   });
-  const queryClient = useQueryClient();
 
   return (
     <Container className="space-y-8">
@@ -80,11 +79,7 @@ export default async function NotesPage(): Promise<ReactElement> {
         ))}
       </div>
 
-      <CreateNote
-        onSubmit={async (data) => {
-          mutation.mutate(data);
-        }}
-      />
+      <CreateNote onSubmit={mutation.mutate} />
 
       {Boolean(error) && <Alert severity="error">{error}</Alert>}
     </Container>
