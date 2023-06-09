@@ -1,3 +1,8 @@
+/**
+ * Since we are using Material UI, and Emotion will not work with SSR, we need to
+ * do `use client`. Ideally, all data is fetched on the server, and the client
+ * only renders the data. But, in this case, we are using SWR, so that's 🆒 at least.
+ */
 'use client';
 
 import { BASE_URL } from '@/lib/constants';
@@ -8,6 +13,7 @@ import Container from '@mui/material/Container';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
 import { type ReactElement } from 'react';
+import useSWR from 'swr';
 import CreateNote from './components/create-note';
 import useError from './hooks/use-error';
 
@@ -47,32 +53,20 @@ async function create(data: NewNoteType): Promise<NoteType> {
 export default async function NotesPage(): Promise<ReactElement> {
   const [error, setError] = useError();
 
-  const queryClient = useQueryClient();
+  const { data } = useSWR(
+    // Using the URL as the key, so that the data is cached.
+    `${BASE_URL}/api/notes/`,
 
-  const mutation = useMutation({
-    mutationFn: create,
-    async onSuccess() {
-      setError(null);
-      await queryClient.invalidateQueries({
-        queryKey: ['notes'],
-      });
-    },
-    onError(error) {
-      setError(
-        error instanceof Error ? error.message : 'Something went wrong!'
-      );
-    },
-  });
-  const query = useQuery({
-    queryKey: ['notes'],
-    queryFn: index,
-  });
+    index
+  );
+
+  const router = useRouter();
 
   return (
     <Container className="space-y-8">
       <h1>🎶</h1>
       <div className="grid grid-cols-4">
-        {query.data?.map((note) => (
+        {data?.map((note) => (
           <Link key={note.id} href={`/notes/${note.id}`}>
             <Note noteData={note} />
           </Link>
