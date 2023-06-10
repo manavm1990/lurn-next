@@ -11,7 +11,7 @@ import { type NewNoteType, type NoteType } from '@/types/note.types';
 import Alert from '@mui/material/Alert';
 import Container from '@mui/material/Container';
 import Link from 'next/link';
-import { type ReactElement } from 'react';
+import { useState, type ReactElement } from 'react';
 import useSWR from 'swr';
 import { v4 as uuidv4 } from 'uuid';
 import CreateNote from './components/create-note';
@@ -50,7 +50,12 @@ async function create(data: NewNoteType): Promise<NoteType> {
 }
 
 export default function NotesPage(): ReactElement {
-  const { data, error, mutate } = useSWR(`${BASE_URL}/api/notes/`, index);
+  const {
+    data,
+    error: indexError,
+    mutate,
+  } = useSWR(`${BASE_URL}/api/notes/`, index);
+  const [createError, setCreateError] = useState<string | null>(null);
 
   const addNoteOptimistically = async (
     submittedNote: NewNoteType
@@ -62,6 +67,8 @@ export default function NotesPage(): ReactElement {
       // Add any other default fields you need for a note.
     };
 
+    setCreateError(null);
+
     // Optimistically update the data on the client side.
     await mutate([...(data ?? []), newNote], {
       optimisticData: [...(data ?? []), newNote],
@@ -70,13 +77,21 @@ export default function NotesPage(): ReactElement {
       revalidate: false,
     });
 
-    // Then, attempt to POST the data to the server.
-    const createdNote = await create(submittedNote);
-    // If the POST request was successful, replace the temporary note
-    // with the real one from the server.
-    await mutate((oldData) =>
-      oldData?.map((note) => (note.id === tempId ? createdNote : note))
-    );
+    try {
+      // Then, attempt to POST the data to the server.
+      const createdNote = await create(submittedNote);
+      // If the POST request was successful, replace the temporary note
+      // with the real one from the server.
+      await mutate((oldData) =>
+        oldData?.map((note) => (note.id === tempId ? createdNote : note))
+      );
+    } catch (error) {
+      if (error instanceof Error) {
+        setCreateError(error.message);
+      } else {
+        setCreateError('Failed to create note 🥅.');
+      }
+    }
   };
 
   return (
@@ -90,11 +105,15 @@ export default function NotesPage(): ReactElement {
         ))}
       </div>
 
-      {Boolean(error) && (
+      {Boolean(indexError) && (
         <Alert severity="error">
-          {error?.message !== '' ? error?.message : 'Some other error 🥅.'}
+          {indexError?.message !== ''
+            ? indexError?.message
+            : 'Failed to fetch notes.'}
         </Alert>
       )}
+
+      {Boolean(createError) && <Alert severity="error">{createError}</Alert>}
 
       <CreateNote onSubmit={addNoteOptimistically} />
     </Container>
