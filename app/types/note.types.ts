@@ -18,6 +18,7 @@ const NoteSchema = z
 
 export const NewNoteSchema = NoteSchema.pick({ title: true, content: true });
 
-export type NewNoteType = Pick<NoteType, 'title' | 'content'>;
+export type NewNoteType = Pick<NoteType, 'title' | 'content'> &
+  Partial<Pick<NoteType, 'id'>>;
 export type NoteParamsType = Pick<NoteType, 'id'>;
 export type NoteType = z.infer<typeof NoteSchema>;
