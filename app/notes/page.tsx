@@ -15,7 +15,7 @@ import { type ReactElement } from 'react';
 import useSWR from 'swr';
 import CreateNote from './components/create-note';
 import useError from './hooks/use-error';
-// TODO: Use `axios` instead of `fetch` for better error handling.
+
 async function index(): Promise<NoteType[]> {
   const res = await fetch(`${BASE_URL}/api/notes/`);
 
