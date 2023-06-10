@@ -13,8 +13,8 @@ import Container from '@mui/material/Container';
 import Link from 'next/link';
 import { type ReactElement } from 'react';
 import useSWR from 'swr';
+import { v4 as uuidv4 } from 'uuid';
 import CreateNote from './components/create-note';
-import useError from './hooks/use-error';
 
 async function index(): Promise<NoteType[]> {
   const res = await fetch(`${BASE_URL}/api/notes/`);
@@ -49,16 +49,35 @@ async function create(data: NewNoteType): Promise<NoteType> {
   return returnedData;
 }
 
-export default async function NotesPage(): Promise<ReactElement> {
-  const [error, setError] = useError();
+export default function NotesPage(): ReactElement {
+  const { data, error, mutate } = useSWR(`${BASE_URL}/api/notes/`, index);
 
-  const { data, mutate } = useSWR(
-    // Using the URL as the key, so that the data is cached.
-    `${BASE_URL}/api/notes/`,
+  const addNoteOptimistically = async (
+    submittedNote: NewNoteType
+  ): Promise<void> => {
+    const tempId = uuidv4(); // Generate a temporary ID
+    const newNote: NewNoteType = {
+      ...submittedNote,
+      id: tempId,
+      // Add any other default fields you need for a note.
+    };
 
-    // Fetcher function ☝️.
-    index
-  );
+    // Optimistically update the data on the client side.
+    await mutate([...(data ?? []), newNote], {
+      optimisticData: [...(data ?? []), newNote],
+      rollbackOnError: true,
+      populateCache: true,
+      revalidate: false,
+    });
+
+    // Then, attempt to POST the data to the server.
+    const createdNote = await create(submittedNote);
+    // If the POST request was successful, replace the temporary note
+    // with the real one from the server.
+    await mutate((oldData) =>
+      oldData?.map((note) => (note.id === tempId ? createdNote : note))
+    );
+  };
 
   return (
     <Container className="space-y-8">
@@ -71,22 +90,13 @@ export default async function NotesPage(): Promise<ReactElement> {
         ))}
       </div>
 
-      <CreateNote
-        onSubmit={async (submittedNote) => {
-          try {
-            const createdNote = await create(submittedNote);
-            await mutate([...(data ?? []), createdNote], false);
-          } catch (error) {
-            if (error instanceof Error) {
-              setError(error.message);
-            } else {
-              setError('Something went wrong!');
-            }
-          }
-        }}
-      />
+      {Boolean(error) && (
+        <Alert severity="error">
+          {error?.message !== '' ? error?.message : 'Some other error 🥅.'}
+        </Alert>
+      )}
 
-      {Boolean(error) && <Alert severity="error">{error}</Alert>}
+      <CreateNote onSubmit={addNoteOptimistically} />
     </Container>
   );
 }

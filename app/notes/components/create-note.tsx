@@ -1,14 +1,13 @@
-import { NewNoteSchema } from '@/types/note.types';
+import { NewNoteSchema, type NewNoteType } from '@/types/note.types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, TextField } from '@mui/material';
 import { type ReactElement } from 'react';
 import { useForm } from 'react-hook-form';
-import { type z } from 'zod';
 
-type FormValues = z.infer<typeof NewNoteSchema>;
+type FormValues = NewNoteType;
 
 interface CreateNoteProps {
-  onSubmit: (data: FormValues) => void;
+  onSubmit: (data: FormValues) => Promise<void>;
 }
 
 export default function CreateNote({
@@ -24,8 +23,8 @@ export default function CreateNote({
     resolver: zodResolver(NewNoteSchema),
   });
 
-  const handleSubmitWithReset = (data: FormValues): void => {
-    onSubmit(data);
+  const handleSubmitWithReset = async (data: FormValues): Promise<void> => {
+    await onSubmit(data);
     reset();
   };
 
