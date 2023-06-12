@@ -98,7 +98,7 @@ export default function NotesPage(): ReactElement {
     <Container className="space-y-8">
       <h1>🎶</h1>
       <div className="grid grid-cols-4">
-        {data?.map((note) => (
+        {data?.map((note: NoteType) => (
           <Link key={note.id} href={`/notes/${note.id}`}>
             <Note noteData={note} />
           </Link>
