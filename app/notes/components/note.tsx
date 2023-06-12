@@ -3,8 +3,9 @@
 import { BASE_URL } from '@/lib/constants';
 import { type NoteType } from '@/types/note.types';
 import Button from '@mui/material/Button';
+import { usePathname, useRouter } from 'next/navigation';
 import { type ReactElement } from 'react';
-import useSWR from 'swr';
+import { useSWRConfig } from 'swr';
 
 interface NoteProps {
   noteData: NoteType;
@@ -21,7 +22,10 @@ async function deleteNote(id: string): Promise<void> {
 }
 
 export default function Note({ noteData: note }: NoteProps): ReactElement {
-  const { mutate } = useSWR(`${BASE_URL}/api/notes/`);
+  const pathname = usePathname();
+  const router = useRouter();
+
+  const { mutate } = useSWRConfig();
 
   return (
     <section
@@ -38,7 +42,12 @@ export default function Note({ noteData: note }: NoteProps): ReactElement {
           // Don't bubble up to the parent and try to `GET`!
           e.preventDefault();
           await deleteNote(note.id);
-          void mutate();
+
+          if (pathname === '/notes') {
+            void mutate(`${BASE_URL}/api/notes/`);
+          } else {
+            router.replace('/notes');
+          }
         }}
       >
         Delete 🔥
