@@ -92,6 +92,18 @@ export default function NotesPage(): ReactElement {
       } else {
         setError('Failed to create note 🥅.');
       }
+
+      setTimeout(() => {
+        mutate().catch((error) => {
+          if (error instanceof Error) {
+            setError(error.message);
+          } else {
+            setError(
+              'Failed to create note 🥅. Refetching the records. Please stand by.'
+            );
+          }
+        });
+      }, 3000);
     }
   };
 
