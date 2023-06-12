@@ -1,16 +1,16 @@
 import { useState, useEffect } from 'react';
 
 export default function useError(
-  isValidating: boolean
+  isDoingSomething: boolean
 ): [string, (error: string) => void] {
   const [error, setError] = useState<string>('');
 
   useEffect(() => {
     // If we're not currently validating (re-fetching), clear the error.
-    if (!isValidating) {
+    if (!isDoingSomething) {
       setError('');
     }
-  }, [isValidating, setError]);
+  }, [isDoingSomething, setError]);
 
   return [error, setError];
 }
