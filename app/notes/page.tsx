@@ -11,7 +11,7 @@ import { type NewNoteType, type NoteType } from '@/types/note.types';
 import Alert from '@mui/material/Alert';
 import Container from '@mui/material/Container';
 import Link from 'next/link';
-import { useEffect, type ReactElement } from 'react';
+import { type ReactElement } from 'react';
 import useSWR from 'swr';
 import { v4 as uuidv4 } from 'uuid';
 import CreateNote from './components/create-note';
@@ -58,14 +58,7 @@ export default function NotesPage(): ReactElement {
     isValidating,
   } = useSWR(`${BASE_URL}/api/notes/`, index);
 
-  const [error, setError] = useError();
-
-  useEffect(() => {
-    // If we're not currently validating (re-fetching), clear the error.
-    if (!isValidating) {
-      setError('');
-    }
-  }, [isValidating, setError]);
+  const [error, setError] = useError(isValidating);
 
   const addNoteOptimistically = async (
     submittedNote: NewNoteType
