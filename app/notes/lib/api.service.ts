@@ -19,3 +19,9 @@ export async function createNote(payload: NewNoteType): Promise<Response> {
     body: JSON.stringify(payload),
   });
 }
+
+export async function deleteNoteById(id: string): Promise<Response> {
+  return await fetch(`${DB_URL}/collections/notes/records/${id}`, {
+    method: 'DELETE',
+  });
+}
