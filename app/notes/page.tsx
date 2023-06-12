@@ -11,10 +11,11 @@ import { type NewNoteType, type NoteType } from '@/types/note.types';
 import Alert from '@mui/material/Alert';
 import Container from '@mui/material/Container';
 import Link from 'next/link';
-import { useState, type ReactElement } from 'react';
+import { type ReactElement } from 'react';
 import useSWR from 'swr';
 import { v4 as uuidv4 } from 'uuid';
 import CreateNote from './components/create-note';
+import useError from './hooks/use-error';
 
 async function index(): Promise<NoteType[]> {
   const res = await fetch(`${BASE_URL}/api/notes/`);
@@ -55,7 +56,7 @@ export default function NotesPage(): ReactElement {
     error: indexError,
     mutate,
   } = useSWR(`${BASE_URL}/api/notes/`, index);
-  const [createError, setCreateError] = useState<string | null>(null);
+  const [error, setError] = useError();
 
   const addNoteOptimistically = async (
     submittedNote: NewNoteType
@@ -67,7 +68,7 @@ export default function NotesPage(): ReactElement {
       // Add any other default fields you need for a note.
     };
 
-    setCreateError(null);
+    setError('');
 
     // Optimistically update the data on the client side.
     await mutate([...(data ?? []), newNote], {
@@ -87,9 +88,9 @@ export default function NotesPage(): ReactElement {
       );
     } catch (error) {
       if (error instanceof Error) {
-        setCreateError(error.message);
+        setError(error.message);
       } else {
-        setCreateError('Failed to create note 🥅.');
+        setError('Failed to create note 🥅.');
       }
     }
   };
@@ -113,7 +114,7 @@ export default function NotesPage(): ReactElement {
         </Alert>
       )}
 
-      {Boolean(createError) && <Alert severity="error">{createError}</Alert>}
+      {Boolean(error) && <Alert severity="error">{error}</Alert>}
 
       <CreateNote onSubmit={addNoteOptimistically} />
     </Container>
